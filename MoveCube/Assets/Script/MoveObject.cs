@@ -136,11 +136,13 @@ public class MoveObject : MonoBehaviour
         if (Physics.Raycast(rayo, out hitInfo))
         {
             selectedObject.SetActive(true);
-            Vector2 posicionRaton = Input.mousePosition;
-            Vector2 posicionModificada = posicionRaton - Input.mousePosition;
-            posicionRaton = Input.mousePosition;
+            Vector3 posicionRaton = Input.mousePosition;
+            Vector3 posicionModificada = posicionRaton - Input.mousePosition;
+            
 
-            selectedObject.transform.position = hitInfo.point; //+ Vector3.up * selectedObject.transform.localScale.y / 2;
+            //transform.RotateAround(selectedObject.transform.position, Vector3.up, 20 * Time.deltaTime);
+            selectedObject.transform.Rotate(posicionRaton  * Time.deltaTime); //+ Vector3.up * selectedObject.transform.localScale.y / 2;
+            posicionRaton = Input.mousePosition;
         }
         selectedObject.SetActive(true);
 
