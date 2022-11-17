@@ -18,7 +18,7 @@ public class ClickMove : MonoBehaviour
                 {                    
                     if (hitInfo.collider != null)
                     {                        
-                        if (!hitInfo.collider.CompareTag("Object"))
+                        if (!hitInfo.collider.tag.Equals("Object"))
                         {                       
                             return;
                         }
@@ -37,7 +37,7 @@ public class ClickMove : MonoBehaviour
                 if (Physics.Raycast(rayo2, out hitInfo2))
                 {
                     selectedObject.SetActive(true);
-                    selectedObject.transform.position = hitInfo2.point * selectedObject.transform.localScale.y/2;
+                    selectedObject.transform.position = hitInfo2.point + Vector3.up * selectedObject.transform.localScale.y/2;
                 }
                 selectedObject = null;
                 Cursor.visible = true;
