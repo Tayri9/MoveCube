@@ -7,7 +7,9 @@ public class MoveObject : MonoBehaviour
     public enum EstadosSelector
     {
         EnEspera,
-        ObjetoSeleccionado,
+        ObjetoSeleccionadoMover,
+        ObjetoSeleccionadoRotar,
+        ObjetoSeleccionadoEscalar,
         Soltar,
         Mover,
         Escalar,
@@ -31,11 +33,19 @@ public class MoveObject : MonoBehaviour
     {
         switch (estadoActual)
         {
-            case EstadosSelector.EnEspera:
-                estadoActual = EstadosSelector.ObjetoSeleccionado;
+            /*case EstadosSelector.EnEspera:
+                estadoActual = EstadosSelector.ObjetoSeleccionadoMover;
+                break;*/
+
+            case EstadosSelector.ObjetoSeleccionadoMover:
+                SeleccionarObjeto();
                 break;
 
-            case EstadosSelector.ObjetoSeleccionado:
+            case EstadosSelector.ObjetoSeleccionadoEscalar:
+                SeleccionarObjeto();
+                break;
+
+            case EstadosSelector.ObjetoSeleccionadoRotar:
                 SeleccionarObjeto();
                 break;
 
@@ -43,41 +53,18 @@ public class MoveObject : MonoBehaviour
                 MoverObjeto();
                 break;
 
+            case EstadosSelector.Rotar:
+                RotarObjeto();
+                break;
+
+            case EstadosSelector.Escalar:
+                EscalarObjeto();
+                break;
+
             case EstadosSelector.Soltar:
                 SoltarObjeto();
                 break;
         }
-
-
-        /*
-        //if (Input.GetMouseButtonUp(0))
-        //{
-            if(selectedObject == null)
-            {
-                SeleccionarObjeto();
-                /*
-                Ray rayo = Camera.main.ScreenPointToRay(Input.mousePosition);
-                RaycastHit hitInfo;                
-                if (Physics.Raycast(rayo, out hitInfo))
-                {
-                    if (hitInfo.collider.CompareTag("Object"))
-                    {
-                        selectedObject = hitInfo.collider.gameObject;
-                        estadoActual = EstadosSelector.Mover;
-                        selectedObject.SetActive(false);
-                        Cursor.visible = false;
-                    }                    
-                }
-            } else
-            {
-                SoltarObjeto();
-            }
-        //}
-
-        if(selectedObject != null)
-        {
-            MoverObjeto();
-        }*/
     }
     
     void SeleccionarObjeto()
@@ -90,10 +77,24 @@ public class MoveObject : MonoBehaviour
             {
                 if (hitInfo.collider.CompareTag("Object"))
                 {
-                    selectedObject = hitInfo.collider.gameObject;
-                    estadoActual = EstadosSelector.Mover;
-                    selectedObject.SetActive(false);
-                    Cursor.visible = false;
+                    selectedObject = hitInfo.collider.gameObject;                    
+                    
+
+                    switch (estadoActual)
+                    {
+                        case EstadosSelector.ObjetoSeleccionadoMover:
+                            estadoActual = EstadosSelector.Mover;
+                            break;
+
+                        case EstadosSelector.ObjetoSeleccionadoRotar:
+                            estadoActual = EstadosSelector.Rotar;
+                            break;
+
+                        case EstadosSelector.ObjetoSeleccionadoEscalar:
+                            estadoActual = EstadosSelector.Escalar;
+                            break;
+                    }
+                    
                 }
             }
         }
@@ -102,6 +103,7 @@ public class MoveObject : MonoBehaviour
     void MoverObjeto()
     {
         selectedObject.SetActive(false);
+        //Cursor.visible = false;
 
         Ray rayo = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hitInfo;
@@ -122,6 +124,57 @@ public class MoveObject : MonoBehaviour
     {
         selectedObject = null;
         estadoActual = EstadosSelector.EnEspera;
-        Cursor.visible = true;
+        //Cursor.visible = true;
+    }
+
+    void RotarObjeto()
+    {
+        selectedObject.SetActive(false);
+
+        Ray rayo = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hitInfo;
+        if (Physics.Raycast(rayo, out hitInfo))
+        {
+            selectedObject.SetActive(true);
+            Vector2 posicionRaton = Input.mousePosition;
+            Vector2 posicionModificada = posicionRaton - Input.mousePosition;
+            posicionRaton = Input.mousePosition;
+
+            selectedObject.transform.position = hitInfo.point; //+ Vector3.up * selectedObject.transform.localScale.y / 2;
+        }
+        selectedObject.SetActive(true);
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            estadoActual = EstadosSelector.Soltar;
+        }
+    }
+
+    void EscalarObjeto()
+    {
+        if (Input.GetMouseButtonUp(1))
+        {
+            selectedObject.transform.localScale = selectedObject.transform.localScale * Input.mouseScrollDelta;
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            estadoActual = EstadosSelector.Soltar;
+        }
+    }
+
+    public void BotonMover()
+    {
+        estadoActual = EstadosSelector.ObjetoSeleccionadoMover;
+    }
+
+    public void BotonRotar()
+    {
+        estadoActual = EstadosSelector.ObjetoSeleccionadoRotar;
+    }
+
+    public void BotonEscalar()
+    {
+        estadoActual = EstadosSelector.ObjetoSeleccionadoEscalar;
     }
 }
