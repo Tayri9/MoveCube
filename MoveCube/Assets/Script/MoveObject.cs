@@ -22,6 +22,10 @@ public class MoveObject : MonoBehaviour
 
     GameObject selectedObject;
 
+    Vector2 posicionRaton, posicionModificada;
+
+   // Vector2 posicionRaton, posicionModificada;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -77,26 +81,32 @@ public class MoveObject : MonoBehaviour
             {
                 if (hitInfo.collider.CompareTag("Object"))
                 {
-                    selectedObject = hitInfo.collider.gameObject;                    
-                    
+                    selectedObject = hitInfo.collider.gameObject;
 
-                    switch (estadoActual)
-                    {
-                        case EstadosSelector.ObjetoSeleccionadoMover:
-                            estadoActual = EstadosSelector.Mover;
-                            break;
+                    CambiarEstadoObjetoSeleccionado();
 
-                        case EstadosSelector.ObjetoSeleccionadoRotar:
-                            estadoActual = EstadosSelector.Rotar;
-                            break;
-
-                        case EstadosSelector.ObjetoSeleccionadoEscalar:
-                            estadoActual = EstadosSelector.Escalar;
-                            break;
-                    }
-                    
                 }
             }
+        }
+    }
+
+    void CambiarEstadoObjetoSeleccionado()
+    {
+        switch (estadoActual)
+        {
+            case EstadosSelector.ObjetoSeleccionadoMover:
+                estadoActual = EstadosSelector.Mover;
+                break;
+
+            case EstadosSelector.ObjetoSeleccionadoRotar:
+                posicionRaton = Input.mousePosition;
+                selectedObject.GetComponent<Rigidbody>().isKinematic = true;
+                estadoActual = EstadosSelector.Rotar;
+                break;
+
+            case EstadosSelector.ObjetoSeleccionadoEscalar:
+                estadoActual = EstadosSelector.Escalar;
+                break;
         }
     }
 
@@ -128,36 +138,23 @@ public class MoveObject : MonoBehaviour
     }
 
     void RotarObjeto()
-    {
-        selectedObject.SetActive(false);
+    {       
+        posicionModificada = posicionRaton - (Vector2)Input.mousePosition;       
 
-        Ray rayo = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hitInfo;
-        if (Physics.Raycast(rayo, out hitInfo))
-        {
-            selectedObject.SetActive(true);
-            Vector3 posicionRaton = Input.mousePosition;
-            Vector3 posicionModificada = posicionRaton - Input.mousePosition;
-            
-
-            //transform.RotateAround(selectedObject.transform.position, Vector3.up, 20 * Time.deltaTime);
-            selectedObject.transform.Rotate(posicionRaton  * Time.deltaTime); //+ Vector3.up * selectedObject.transform.localScale.y / 2;
-            posicionRaton = Input.mousePosition;
-        }
-        selectedObject.SetActive(true);
+        selectedObject.transform.Rotate(posicionModificada.y, posicionModificada.x, 0f);
+        posicionRaton = Input.mousePosition;
+     
 
         if (Input.GetMouseButtonUp(0))
         {
+            selectedObject.GetComponent<Rigidbody>().isKinematic = false;
             estadoActual = EstadosSelector.Soltar;
         }
     }
 
     void EscalarObjeto()
     {
-        if (Input.GetMouseButtonUp(1))
-        {
-            selectedObject.transform.localScale = selectedObject.transform.localScale * Input.mouseScrollDelta;
-        }
+        selectedObject.transform.localScale += Vector3.one * Input.mouseScrollDelta.y;       
 
         if (Input.GetMouseButtonUp(0))
         {
