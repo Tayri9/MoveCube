@@ -175,6 +175,7 @@ public class MoveObject : MonoBehaviour
     public void CrearObjeto(GameObject prefab)
     {        
         selectedObject = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+        selectedObject.GetComponent<MeshRenderer>().material.color = Random.ColorHSV();
         estadoActual = EstadosSelector.EsperaMover;
     }
 
