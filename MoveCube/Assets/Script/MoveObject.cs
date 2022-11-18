@@ -12,8 +12,10 @@ public class MoveObject : MonoBehaviour
         ObjetoSeleccionadoEscalar,
         Soltar,
         Mover,
+        EsperaMover,
         Escalar,
         Rotar,
+        Crear,
         //Los estados que necesitemos
     }
 
@@ -24,12 +26,16 @@ public class MoveObject : MonoBehaviour
 
     Vector2 posicionRaton, posicionModificada;
 
+    [SerializeField]
+    GameObject grid1, grid2;
+
    // Vector2 posicionRaton, posicionModificada;
 
     // Start is called before the first frame update
     void Start()
-    {
-        
+    {       
+        grid1.SetActive(true);
+        grid2.SetActive(false);
     }
 
     // Update is called once per frame
@@ -67,6 +73,9 @@ public class MoveObject : MonoBehaviour
 
             case EstadosSelector.Soltar:
                 SoltarObjeto();
+                break;
+            case EstadosSelector.EsperaMover:
+                estadoActual = EstadosSelector.Mover;
                 break;
         }
     }
@@ -117,6 +126,7 @@ public class MoveObject : MonoBehaviour
 
         Ray rayo = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hitInfo;
+
         if (Physics.Raycast(rayo, out hitInfo))
         {
             selectedObject.SetActive(true);
@@ -162,6 +172,14 @@ public class MoveObject : MonoBehaviour
         }
     }
 
+    public void CrearObjeto(GameObject prefab)
+    {        
+        selectedObject = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+        estadoActual = EstadosSelector.EsperaMover;
+    }
+
+    //Botones
+
     public void BotonMover()
     {
         estadoActual = EstadosSelector.ObjetoSeleccionadoMover;
@@ -176,4 +194,19 @@ public class MoveObject : MonoBehaviour
     {
         estadoActual = EstadosSelector.ObjetoSeleccionadoEscalar;
     }
+
+    public void BotonCrear()
+    {
+        grid1.SetActive(false);
+        grid2.SetActive(true);
+        estadoActual = EstadosSelector.Crear;
+    }
+
+    public void BotonCancelar()
+    {
+        grid2.SetActive(false);
+        grid1.SetActive(true);
+        estadoActual = EstadosSelector.EnEspera;
+    }
+    
 }
